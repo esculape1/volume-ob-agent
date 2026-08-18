@@ -33,7 +33,7 @@ MIN_LEVERAGE = 2
 TARGET_RISK_REWARD = 2.0         # ratio gain/risque visé par défaut pour la cible suggérée
 
 # --- Score de confluence minimum pour déclencher une alerte ---
-MIN_CONFLUENCE_SCORE = 3         # sur un total de ~5 critères (voir signal_engine.py)
+MIN_CONFLUENCE_SCORE = 4         # sur un total de ~5 critères (voir signal_engine.py)
 
 # --- Boucle ---
 POLL_INTERVAL_SECONDS = 900      # 15 min entre deux analyses en mode continu
