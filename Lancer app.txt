@@ -1,0 +1,6 @@
+1. Faut-il refaire toutes les étapes à chaque fois ?
+
+Non ! L'installation (Python, dépendances) ne se fait qu'une seule fois. La prochaine fois, tu n'as que 2 étapes à refaire :
+
+Ouvrir le dossier volume_ob_agent, taper cmd dans la barre d'adresse, Entrée
+Taper python main.py (ou python main.py --loop pour tourner en continu)
