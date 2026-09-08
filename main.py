@@ -40,11 +40,17 @@ def analyze_once(exchange):
                 signals.append(sig)
                 _print_signal(sig)
                 if cfg.TELEGRAM_ENABLED:
-                    notifier.send_telegram_message(
+                    sent = notifier.send_telegram_message(
                         cfg.TELEGRAM_BOT_TOKEN,
                         cfg.TELEGRAM_CHAT_ID,
                         notifier.format_signal_message(sig),
                     )
+                    if sent:
+                        logger.info(f"Message Telegram envoyé avec succès pour le signal {sig.symbol}.")
+                    else:
+                        logger.error(f"ÉCHEC de l'envoi Telegram pour le signal {sig.symbol} — voir l'erreur ci-dessus.")
+                else:
+                    logger.warning(f"Signal {sig.symbol} détecté mais Telegram est désactivé — aucune notification envoyée.")
             else:
                 logger.info(f"{symbol} : aucune configuration de confluence suffisante en ce moment.")
         except Exception as e:
@@ -73,6 +79,21 @@ def _print_signal(sig: signal_engine.Signal):
 def main():
     exchange = data_fetcher.get_exchange(cfg.EXCHANGE_ID)
     loop_mode = "--loop" in sys.argv
+
+    # Diagnostic de démarrage : visible dans les logs (y compris sur GitHub
+    # Actions, onglet Actions > clic sur une exécution), pour vérifier en un
+    # coup d'œil que la configuration attendue est bien active.
+    logger.info(f"Symboles suivis : {', '.join(cfg.SYMBOLS)}")
+    logger.info(f"Timeframe : {cfg.TIMEFRAME} | Score minimum requis : {cfg.MIN_CONFLUENCE_SCORE}/5")
+    if cfg.TELEGRAM_ENABLED:
+        masked_token = (cfg.TELEGRAM_BOT_TOKEN[:6] + "...") if cfg.TELEGRAM_BOT_TOKEN else "(vide)"
+        logger.info(f"Telegram : ACTIVÉ (token={masked_token}, chat_id={cfg.TELEGRAM_CHAT_ID})")
+    else:
+        logger.warning(
+            "Telegram : DÉSACTIVÉ — TELEGRAM_BOT_TOKEN et/ou TELEGRAM_CHAT_ID "
+            "sont vides ou absents (variables d'environnement ou config.py). "
+            "Aucune notification ne sera envoyée tant que ce n'est pas corrigé."
+        )
 
     if not loop_mode:
         logger.info("Analyse ponctuelle en cours...")

@@ -8,16 +8,21 @@ import logging
 logger = logging.getLogger("volume_ob_agent")
 
 
-def send_telegram_message(bot_token: str, chat_id: str, text: str):
+def send_telegram_message(bot_token: str, chat_id: str, text: str) -> bool:
+    """Envoie le message. Renvoie True si Telegram a confirmé la réception, False sinon."""
     if not bot_token or not chat_id:
-        return
+        logger.warning("send_telegram_message appelé sans token/chat_id valide — envoi annulé.")
+        return False
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     try:
         resp = requests.post(url, data={"chat_id": chat_id, "text": text}, timeout=10)
         if resp.status_code != 200:
             logger.error(f"Échec envoi Telegram ({resp.status_code}) : {resp.text}")
+            return False
+        return True
     except Exception as e:
         logger.error(f"Erreur lors de l'envoi Telegram : {e}")
+        return False
 
 
 def format_signal_message(sig) -> str:

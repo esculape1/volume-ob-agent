@@ -8,8 +8,8 @@ import os
 EXCHANGE_ID = "binance"          # exchange ccxt à utiliser
 SYMBOLS = [
     "BTC/USDT", "ETH/USDT", "SOL/USDT",
-    "BNB/USDT", "XRP/USDT", "ADA/USDT",
-]  # paires à surveiller — ajoute/enlève librement (voir README pour la syntaxe)
+    "XRP/USDT", "ADA/USDT",
+]  # BNB/USDT retiré après backtest : -15,54R sur 32 trades, 16% de réussite
 TIMEFRAME = "4h"                 # unité de temps des bougies (1h, 4h, 1d, ...)
 CANDLES_LOOKBACK = 300           # nombre de bougies historiques à charger
 
@@ -33,10 +33,15 @@ MIN_LEVERAGE = 2
 TARGET_RISK_REWARD = 2.0         # ratio gain/risque visé par défaut pour la cible suggérée
 
 # --- Score de confluence minimum pour déclencher une alerte ---
-MIN_CONFLUENCE_SCORE = 4         # sur un total de ~5 critères (voir signal_engine.py)
+MIN_CONFLUENCE_SCORE = 4         # sur un total de ~5 critères (relevé de 3 à 4 après backtest : les trades à score 3 étaient à l'équilibre/perdants)
 
 # --- Boucle ---
 POLL_INTERVAL_SECONDS = 900      # 15 min entre deux analyses en mode continu
+
+# --- Backtest ---
+BACKTEST_CANDLES = 1200          # nb de bougies historiques à charger pour le backtest
+BACKTEST_MAX_HOLD_BARS = 60      # abandon d'un trade si ni stop ni cible touché après N bougies
+BACKTEST_RISK_PCT = 1.0          # % du capital risqué par trade, pour la courbe d'équité simulée
 
 # --- Notifications Telegram (optionnel) ---
 # En local : tu peux renseigner directement TOKEN et CHAT_ID ci-dessous.

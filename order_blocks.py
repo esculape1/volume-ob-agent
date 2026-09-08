@@ -11,6 +11,7 @@ Définition utilisée (heuristique standard "smart money concepts") :
 """
 from dataclasses import dataclass
 import pandas as pd
+import numpy as np
 
 
 @dataclass
@@ -25,19 +26,21 @@ class OrderBlock:
 
 
 def find_swings(df: pd.DataFrame, lookback: int):
-    """Repère les swing highs et swing lows (fractals)."""
-    highs = df["high"]
-    lows = df["low"]
-    swing_high_idx = []
-    swing_low_idx = []
-    n = len(df)
-    for i in range(lookback, n - lookback):
-        window_high = highs.iloc[i - lookback: i + lookback + 1]
-        window_low = lows.iloc[i - lookback: i + lookback + 1]
-        if highs.iloc[i] == window_high.max():
-            swing_high_idx.append(i)
-        if lows.iloc[i] == window_low.min():
-            swing_low_idx.append(i)
+    """
+    Repère les swing highs et swing lows (fractals) : un point est un swing
+    s'il est le plus extrême parmi les `lookback` bougies de chaque côté.
+    Version vectorisée (rolling centré) — équivalente à une recherche
+    bougie par bougie mais bien plus rapide sur de longs historiques.
+    """
+    window = 2 * lookback + 1
+    roll_max = df["high"].rolling(window, center=True).max()
+    roll_min = df["low"].rolling(window, center=True).min()
+
+    is_swing_high = (df["high"] == roll_max) & roll_max.notna()
+    is_swing_low = (df["low"] == roll_min) & roll_min.notna()
+
+    swing_high_idx = list(np.where(is_swing_high.values)[0])
+    swing_low_idx = list(np.where(is_swing_low.values)[0])
     return swing_high_idx, swing_low_idx
 
 
